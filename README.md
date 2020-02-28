@@ -84,9 +84,8 @@ so that its functionality is available by calling the library.
 *getting the data*
 
 We will use data provided by [The Nobel
-Prize](https://www.nobelprize.org/). Here, we can use the url function
-wrapped by the read\_csv function to import the data from the Nobel
-Prize API.
+Prize](https://www.nobelprize.org/). Here, we can use the read\_csv
+function to import the data from the Nobel Prize API.
 
   - Note that we are not downloading the data to a file but rather
     reading them directly into our R environment. For a reproducible
@@ -121,11 +120,14 @@ Descriptions of relevant (there are more) variables are as follows:
 There are some observations in this dataset that we will exclude from
 our analysis to match the Buzzfeed results.
 
-Create a new data frame called `nobel_living` that filters for: -
-laureates for whom `country` is available - laureates who are people as
-opposed to organizations (organizations are denoted with `"org"` as
-their `gender`) - laureates who are still alive (their `died_date` is
-`NA`)
+Create a new data frame called `nobel_living` that filters for:
+
+  - laureates for whom `country` is available
+  - laureates who are people as opposed to organizations (organizations
+    are denoted with `"org"` as their `gender`)
+  - laureates who are still alive (their `died_date` is `NA`)
+
+<!-- end list -->
 
 ``` r
 nobel_living <- nobel %>% 
