@@ -1,0 +1,108 @@
+---
+title: "my assignment title"
+author: "my name"
+date: "my assignment submission date"
+output: github_document
+---
+
+```{r load-packages, include=FALSE}
+
+library(package = tidyverse)
+```
+
+
+```{r load-data, message=FALSE, eval=TRUE, warning=FALSE, echo=FALSE}
+
+# read data from Nobel Prize API
+
+nobel <- read_csv("http://api.nobelprize.org/v1/laureate.csv")
+```
+
+  
+```{r living-laureates, eval=TRUE, echo=FALSE}
+
+# Create a new data frame called `nobel_living` that, per Buzzfeed, filters for:
+# - laureates for whom `country` is available
+# - laureates who are people as opposed to organizations (organizations are denoted with `"org"` as their `gender`)
+# - laureates who are still alive (their `died_date` is `NA`)
+
+# Among these results, the only prize categories are physics, chemistry,
+# medicine, and economics, which mirror Buzfeed's analysis, so we do not need
+# to filter based on category.
+
+nobel_living <- nobel %>% 
+  filter(
+    !is.na(country),
+    !grepl("org", gender, ignore.case = TRUE),
+    is.na(died)
+  )
+``` 
+
+
+```{r living-laureates-demographics, eval=TRUE, echo=FALSE}
+
+# Create a new data frame called nobel_living_demographics that summarizes: (1)
+# the total number of native and forgeign-born Nobel laureates relative to the
+# country in which they were residing when they received their prize, and (2)
+# the total number of laureates from each country (that will be used for
+# plotting).
+
+# One of the more challenging steps in this workflow is that we need to consider
+# laureates who were born in countries for which the name has changed. For
+# example, some laureates were born in West Germany, which is listed as "West
+# Germany (now Germany)" in the Nobel data set. We will perform some string
+# manipulation to use only the current country name (i.e., "Germany" in that
+# example).
+
+nobel_living_demographics <- nobel_living %>% 
+  # filter data to exclude recipients residing in the USA
+  filter(!grepl("usa", country, ignore.case = TRUE)) %>% 
+  mutate(
+    # make a new column (bornCountryModern) that reflects the current name of
+    # countries
+    bornCountryModern = ifelse(grepl("now ",bornCountry), word(bornCountry,-1), bornCountry),
+    bornCountryModern = gsub(")","", bornCountryModern),
+    # make a new column (receiptRelativeToBirth) that reflects whether a
+    # recipient was born in the country where they received the award
+    receiptRelativeToBirth = if_else(bornCountry != country, "foreign born", "native")
+  ) %>% 
+  # group by country and receiptRelativeToBirth to tally the number of
+  # recipients for all cases
+  group_by(country, receiptRelativeToBirth) %>% 
+  summarise(prizeRecipients = n()) %>% 
+  ungroup() %>% 
+  # join another data frame that we produce on-the-fly to calculate the total
+  # number of recipients for each country - we will need this to arrange the
+  # data in our graph
+  inner_join(nobel_living %>% count(country, name = "countryTotal"), by = 'country')
+
+```
+
+### overview
+
+add 2-3 sentences setting up the plot/analyses
+
+```{r plot-demographics, eval=TRUE, echo=FALSE}
+
+# Use the nobel_living_demographics data frame you crated above to plot the
+# number of recipients for each country distinguished by their country of birth
+# relative to the country where they received their award - arrange the number
+# by the total number of recipients for each country.
+
+nobel_living_demographics %>% 
+  ggplot(aes(x = reorder(country, countryTotal), y = prizeRecipients, fill = receiptRelativeToBirth)) +
+  # illustrate data with bars
+  geom_bar(stat = 'identity') +
+  # flip the chart so that the bars are horizontal
+  coord_flip() +
+  # add a title and more meaningful labels
+  ggtitle('country of residence at time of award relative to country of birth among living Nobel laureates') +
+  labs(fill = "") +
+  xlab('country of residence (when prize was awarded)') +
+  ylab('number of recipients')
+
+```
+
+### conclusions
+
+add 2-3 sentences summarizing the patterns
