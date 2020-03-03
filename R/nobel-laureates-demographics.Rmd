@@ -96,7 +96,7 @@ nobel_living_demographics %>%
   # flip the chart so that the bars are horizontal
   coord_flip() +
   # add a title and more meaningful labels
-  ggtitle('country of residence at time of award relative to country of birth among living Nobel laureates') +
+  ggtitle('living laureates: residence relative to country of birth') +
   labs(fill = "") +
   xlab('country of residence (when prize was awarded)') +
   ylab('number of recipients')

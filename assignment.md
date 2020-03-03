@@ -27,5 +27,5 @@ data for an overview of working with RStudio, Git, and GitHub.
 2. knit Rmd to md
 3. push output of knit (md and all supporting files) to GitHub
 
-**View the output on GitHub to be sure that the output is as you expect (e.g.,
-text, figures, and code (if relevant) are displayed without broken links).**
+View the output on GitHub to be sure that the output is as you expect (e.g.,
+text, figures, and code (if relevant) are displayed without broken links).
